@@ -1,8 +1,37 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Skills Management System";
+    Layout = null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/home.css" />
+
+</head>
+<body>
+    <div class="splash-container">
+        <div class="logo">
+            💼
+        </div>
+        <h1>Skills Management</h1>
+        <p>HR Admin Portal</p>
+        <div class="loading">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <script>
+        // Redirect to login after 4 seconds
+        setTimeout(function() {
+            window.location.href = '@Url.Action("Login", "Account")';
+        }, 4000);
+    </script>
+
+</body>
+</html>

@@ -1,217 +1,161 @@
-﻿@model VisitorManagement.Controllers.ReportsViewModel
-@{
+﻿@{
     ViewData["Title"] = "Reports & Analytics";
 }
 
-<link rel="stylesheet" href="~/css/repoindex.css" asp-append-version="true" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/report.css" />
+}
 
-<div class="reports-header">
-    <h1 class="reports-title">
-        <i class="fas fa-chart-bar"></i>
-        Reports & Analytics
-    </h1>
-    <a href="@Url.Action("Export", new { startDate = Model.StartDate, endDate = Model.EndDate, format = "csv" })" class="btn-export">
-        <i class="fas fa-download"></i>
-        Export CSV
-    </a>
-</div>
-
-<div class="filter-card">
-    <form asp-action="Generate" method="post" class="filter-form">
-        <div class="form-group">
-            <label class="form-label">Start Date</label>
-            <input type="date" name="startDate" class="form-input" value="@Model.StartDate.ToString("yyyy-MM-dd")" required />
-        </div>
-        <div class="form-group">
-            <label class="form-label">End Date</label>
-            <input type="date" name="endDate" class="form-input" value="@Model.EndDate.ToString("yyyy-MM-dd")" required />
-        </div>
-        <div class="form-group">
-            <label class="form-label">Report Type</label>
-            <select name="reportType" class="form-input">
-                <option value="summary">Summary</option>
-                <option value="detailed">Detailed</option>
-                <option value="trends">Trends</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn-generate">
-                <i class="fas fa-sync-alt"></i>
-                Generate Report
-            </button>
-        </div>
-    </form>
-</div>
-
-<div class="stats-grid">
-    <div class="stat-card blue">
-        <div class="stat-value">@Model.TotalVisits</div>
-        <div class="stat-label">Total Visits</div>
-    </div>
-    <div class="stat-card green">
-        <div class="stat-value">@Model.ApprovedVisits</div>
-        <div class="stat-label">Approved Visits</div>
-    </div>
-    <div class="stat-card yellow">
-        <div class="stat-value">@Model.PendingVisits</div>
-        <div class="stat-label">Pending Visits</div>
-    </div>
-    <div class="stat-card red">
-        <div class="stat-value">@Model.DeniedVisits</div>
-        <div class="stat-label">Denied Visits</div>
-    </div>
-    <div class="stat-card purple">
-        <div class="stat-value">@Model.TotalCheckIns</div>
-        <div class="stat-label">Total Check-Ins</div>
-    </div>
-    <div class="stat-card blue">
-        <div class="stat-value">@string.Format("{0:0.0}", Model.AverageVisitsPerDay)</div>
-        <div class="stat-label">Avg Visits/Day</div>
+<div class="page-header mb-4">
+    <div>
+        <h2>Reports & Analytics</h2>
+        <p class="text-muted">Generate comprehensive reports and insights</p>
     </div>
 </div>
 
-<div class="charts-grid">
-    <div class="chart-card">
-        <h3 class="chart-title">
-            <i class="fas fa-chart-line"></i>
-            Visits Over Time
-        </h3>
-        <div class="chart-container">
-            <canvas id="visitsChart"></canvas>
-        </div>
-    </div>
-
-    <div class="chart-card">
-        <h3 class="chart-title">
-            <i class="fas fa-chart-pie"></i>
-            Visits by Status
-        </h3>
-        <div class="chart-container">
-            <canvas id="statusChart"></canvas>
-        </div>
-    </div>
-
-    <div class="chart-card">
-        <h3 class="chart-title">
-            <i class="fas fa-building"></i>
-            Top Companies
-        </h3>
-        @if (Model.TopCompanies != null && Model.TopCompanies.Any())
-        {
-            <ul class="top-list">
-                @for (int i = 0; i < Math.Min(5, Model.TopCompanies.Count); i++)
-                {
-                    var company = Model.TopCompanies[i];
-                    <li class="top-list-item">
-                        <span class="item-rank">@(i + 1)</span>
-                        <span class="item-name">@company.Company</span>
-                        <span class="item-count">@company.Count visits</span>
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <div style="text-align: center; padding: 2rem; color: #94a3b8;">
-                <i class="fas fa-building" style="font-size: 2rem; opacity: 0.5; margin-bottom: 0.5rem;"></i>
-                <p>No data available</p>
+<div class="row">
+    <!-- Skill Audit Report -->
+    <div class="col-md-6 mb-4">
+        <div class="report-card">
+            <div class="report-icon">
+                <i class="fas fa-chart-bar"></i>
             </div>
-        }
+            <div class="report-content">
+                <h4>Skills Audit Report</h4>
+                <p>Comprehensive overview of all employee skills, proficiency levels, and skill gaps across the organization.</p>
+                <div class="report-features">
+                    <span><i class="fas fa-check"></i> Employee skills breakdown</span>
+                    <span><i class="fas fa-check"></i> Proficiency analysis</span>
+                    <span><i class="fas fa-check"></i> Exportable to Excel/PDF</span>
+                </div>
+            </div>
+            <div class="report-actions">
+                <a asp-action="SkillAudit" class="btn btn-primary mb-2">
+                    <i class="fas fa-eye"></i> View Report
+                </a>
+                <div class="btn-group w-100">
+                    <a asp-action="ExportSkillAuditExcel" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </a>
+                    <a asp-action="ExportSkillAuditPDF" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="chart-card">
-        <h3 class="chart-title">
-            <i class="fas fa-user-tie"></i>
-            Top Hosts
-        </h3>
-        @if (Model.TopHosts != null && Model.TopHosts.Any())
-        {
-            <ul class="top-list">
-                @for (int i = 0; i < Math.Min(5, Model.TopHosts.Count); i++)
-                {
-                    var host = Model.TopHosts[i];
-                    <li class="top-list-item">
-                        <span class="item-rank">@(i + 1)</span>
-                        <span class="item-name">@host.HostName</span>
-                        <span class="item-count">@host.Count visits</span>
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <div style="text-align: center; padding: 2rem; color: #94a3b8;">
-                <i class="fas fa-user-tie" style="font-size: 2rem; opacity: 0.5; margin-bottom: 0.5rem;"></i>
-                <p>No data available</p>
+    <!-- Training Summary -->
+    <div class="col-md-6 mb-4">
+        <div class="report-card">
+            <div class="report-icon">
+                <i class="fas fa-graduation-cap"></i>
             </div>
-        }
+            <div class="report-content">
+                <h4>Training Summary Report</h4>
+                <p>Detailed analysis of training programs, completion rates, and employee participation across all departments.</p>
+                <div class="report-features">
+                    <span><i class="fas fa-check"></i> Completion statistics</span>
+                    <span><i class="fas fa-check"></i> HR suggested vs self-enrolled</span>
+                    <span><i class="fas fa-check"></i> Department breakdown</span>
+                </div>
+            </div>
+            <div class="report-actions">
+                <a asp-action="TrainingSummary" class="btn btn-primary mb-2">
+                    <i class="fas fa-eye"></i> View Report
+                </a>
+                <div class="btn-group w-100">
+                    <a asp-action="ExportTrainingSummaryExcel" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </a>
+                    <a asp-action="ExportTrainingSummaryPDF" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Analysis -->
+    <div class="col-md-6 mb-4">
+        <div class="report-card">
+            <div class="report-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="report-content">
+                <h4>Department Analysis</h4>
+                <p>Compare skills, qualifications, and training metrics across different departments in your organization.</p>
+                <div class="report-features">
+                    <span><i class="fas fa-check"></i> Department comparison</span>
+                    <span><i class="fas fa-check"></i> Skill distribution</span>
+                    <span><i class="fas fa-check"></i> Performance metrics</span>
+                </div>
+            </div>
+            <div class="report-actions">
+                <a asp-action="DepartmentAnalysis" class="btn btn-primary mb-2">
+                    <i class="fas fa-eye"></i> View Report
+                </a>
+                <div class="btn-group w-100">
+                    <a asp-action="ExportDepartmentAnalysisExcel" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </a>
+                    <a asp-action="ExportDepartmentAnalysisPDF" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Reports (Coming Soon) -->
+    <div class="col-md-6 mb-4">
+        <div class="report-card report-card-disabled">
+            <div class="report-icon">
+                <i class="fas fa-magic"></i>
+            </div>
+            <div class="report-content">
+                <h4>Custom Report Builder</h4>
+                <p>Create customized reports with specific metrics, filters, and visualizations tailored to your needs.</p>
+                <div class="report-features">
+                    <span><i class="fas fa-check"></i> Custom filters</span>
+                    <span><i class="fas fa-check"></i> Multiple export formats</span>
+                    <span><i class="fas fa-check"></i> Save report templates</span>
+                </div>
+                <span class="badge bg-info">Coming Soon</span>
+            </div>
+            <div class="report-actions">
+                <button class="btn btn-secondary w-100" disabled>
+                    <i class="fas fa-lock"></i> Coming Soon
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-    // Visits Over Time Chart
-    const visitsData = @Html.Raw(Json.Serialize(Model.VisitsByDate));
-    const visitsCtx = document.getElementById('visitsChart');
-
-    new Chart(visitsCtx, {
-        type: 'line',
-        data: {
-            labels: visitsData.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-            datasets: [{
-                label: 'Visits',
-                data: visitsData.map(d => d.count),
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        }
-    });
-
-    // Status Distribution Chart
-    const statusData = @Html.Raw(Json.Serialize(Model.VisitsByStatus));
-    const statusCtx = document.getElementById('statusChart');
-
-    new Chart(statusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: statusData.map(d => d.status.charAt(0).toUpperCase() + d.status.slice(1)),
-            datasets: [{
-                data: statusData.map(d => d.count),
-                backgroundColor: [
-                    '#10b981',
-                    '#f59e0b',
-                    '#ef4444'
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-</script>
+<!-- Quick Export Section -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5><i class="fas fa-download"></i> Quick Export Options</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-3">Generate and download reports instantly in your preferred format</p>
+        <div class="export-buttons">
+            <a asp-action="ExportSkillAuditExcel" class="export-btn">
+                <i class="fas fa-file-excel"></i>
+                <span>Skills Audit (Excel)</span>
+            </a>
+            <a asp-action="ExportTrainingSummaryExcel" class="export-btn">
+                <i class="fas fa-file-excel"></i>
+                <span>Training Summary (Excel)</span>
+            </a>
+            <a asp-action="ExportDepartmentAnalysisExcel" class="export-btn">
+                <i class="fas fa-file-excel"></i>
+                <span>Department Analysis (Excel)</span>
+            </a>
+        </div>
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle"></i>
+            <strong>PDF Export:</strong> To export any report as PDF, view the report and use your browser's print function (Ctrl+P or Cmd+P), then select "Save as PDF" as the destination.
+        </div>
+    </div>
+</div>
